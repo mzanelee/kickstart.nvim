@@ -314,7 +314,7 @@ require('lazy').setup({
     opts = {
       -- delay between pressing a key and opening which-key (milliseconds)
       -- this setting is independent of vim.o.timeoutlen
-      delay = 0,
+      delay = 100,
       icons = {
         -- set icon mappings to true if you have a Nerd Font
         mappings = vim.g.have_nerd_font,
@@ -354,6 +354,7 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
+        { '<leader>d', group = '[D]ebug' },
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
@@ -479,17 +480,48 @@ require('lazy').setup({
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
+      local function set_custom_mappings(bufnr)
+        local api = require 'nvim-tree.api'
+
+        local function opts(desc)
+          return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+
+        local function vsplit_preview()
+          local node = api.tree.get_node_under_cursor()
+
+          if node.nodes ~= nil then
+            api.node.open.edit()
+          else
+            api.node.open.vertical()
+          end
+
+          api.tree.focus()
+        end
+
+        vim.keymap.set('n', 'l', api.node.open.edit, opts 'Edit Or Open')
+        vim.keymap.set('n', 'L', vsplit_preview, opts 'Vsplit Preview')
+        vim.keymap.set('n', 'h', api.node.navigate.parent_close, opts 'Close')
+        vim.keymap.set('n', 'H', api.tree.collapse_all, opts 'Collapse All')
+        vim.keymap.set('n', 'N', api.fs.create, opts 'Create New')
+        vim.keymap.set('n', 'd', api.fs.cut, opts 'Cut')
+        vim.keymap.set('n', 'D', api.fs.remove, opts 'Delete')
+        vim.keymap.set('n', 'y', api.fs.copy.node, opts 'Copy')
+        vim.keymap.set('n', 'p', api.fs.paste, opts 'Paste')
+      end
+
       require('nvim-tree').setup {
         filters = { dotfiles = false },
         disable_netrw = true,
         hijack_cursor = true,
         sync_root_with_cwd = true,
+        on_attach = set_custom_mappings,
         update_focused_file = {
           enable = true,
           update_root = false,
         },
         view = {
-          width = 40,
+          width = 35,
           preserve_window_proportions = true,
         },
         renderer = {
@@ -513,6 +545,59 @@ require('lazy').setup({
       }
     end,
   },
+  {
+    'altermo/ultimate-autopair.nvim',
+    event = { 'InsertEnter', 'CmdlineEnter' },
+    branch = 'v0.6',
+    opts = {
+      cmap = false,
+    },
+  },
+  {
+    'mfussenegger/nvim-dap',
+    dependencies = {
+      'mrcarriga/nvim-dap-ui',
+      'nvim-neotest/nvim-nio',
+      'mason-org/mason.nvim',
+      'jay-babu/mason-nvim-dap.nvim',
+    },
+    config = function()
+      local dap = require 'dap'
+      local dapui = require 'dapui'
+
+      require('mason-nvim-dap').setup {
+        ensure_installed = { 'codelldb' },
+        automatic_installation = true,
+        handlers = {},
+      }
+
+      dapui.setup()
+
+      dap.listeners.after.event_initialized['dapui_config'] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated['dapui_config'] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited['dapui_config'] = function()
+        dapui.close()
+      end
+
+      -- Keymaps for debugging
+      vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, { desc = '[D]ebug [B]reakpoint' })
+      vim.keymap.set('n', '<leader>dc', dap.continue, { desc = '[D]ebug [C]ontinue' })
+      vim.keymap.set('n', '<leader>di', dap.step_into, { desc = '[D]ebug Step [I]nto' })
+      vim.keymap.set('n', '<leader>do', dap.step_over, { desc = '[D]ebug Step [O]ver' })
+      vim.keymap.set('n', '<leader>dO', dap.step_out, { desc = '[D]ebug Step [O]ut' })
+      vim.keymap.set('n', '<leader>dr', dap.repl.open, { desc = '[D]ebug [R]EPL' })
+      vim.keymap.set('n', '<leader>dl', dap.run_last, { desc = '[D]ebug Run [L]ast' })
+      vim.keymap.set('n', '<leader>dt', dap.terminate, { desc = '[D]ebug [T]erminate' })
+
+      vim.keymap.set('n', '<F5>', dap.continue, { desc = 'Debug: Start/Continue' })
+
+      vim.fn.sign_define('DapBreakpoint', { text = '', texthl = 'Error', linehl = '', numhl = '' })
+    end,
+  },
 
   -- LSP Plugins
   {
@@ -524,6 +609,7 @@ require('lazy').setup({
       library = {
         -- Load luvit types when the `vim.uv` word is found
         { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        'nvim-dap-ui',
       },
     },
   },
@@ -773,6 +859,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'codelldb',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
