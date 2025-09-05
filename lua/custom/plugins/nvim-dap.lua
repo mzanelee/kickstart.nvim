@@ -6,28 +6,28 @@ return {
       'nvim-neotest/nvim-nio',
       'mason-org/mason.nvim',
       'jay-babu/mason-nvim-dap.nvim',
+      'mfussenegger/nvim-dap-python',
     },
     config = function()
       local dap = require 'dap'
       local dapui = require 'dapui'
 
       require('mason-nvim-dap').setup {
-        ensure_installed = { 'codelldb' },
+        ensure_installed = {
+          'codelldb',
+          'python',
+        },
         automatic_installation = true,
         handlers = {},
       }
 
       dapui.setup()
 
-      dap.listeners.after.event_initialized['dapui_config'] = function()
-        dapui.open()
-      end
-      dap.listeners.before.event_terminated['dapui_config'] = function()
-        dapui.close()
-      end
-      dap.listeners.before.event_exited['dapui_config'] = function()
-        dapui.close()
-      end
+      dap.listeners.after.event_initialized['dapui_config'] = dapui.open
+      dap.listeners.before.event_terminated['dapui_config'] = dapui.close
+      dap.listeners.before.event_exited['dapui_config'] = dapui.close
+
+      require('dap-python').setup()
 
       -- Keymaps for debugging
       vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, { desc = '[D]ebug [B]reakpoint' })

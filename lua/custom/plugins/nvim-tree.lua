@@ -56,8 +56,13 @@ return {
           highlight_git = true,
           indent_markers = { enable = true },
           icons = {
+            git_placement = 'after',
             glyphs = {
               default = '󰈚',
+              symlink = '󱓻',
+              bookmark = '',
+              modified = '',
+              hidden = '󱙝',
               folder = {
                 default = '',
                 empty = '',
@@ -65,7 +70,15 @@ return {
                 open = '',
                 symlink = '',
               },
-              git = { unmerged = '' },
+              git = {
+                unstaged = '×',
+                staged = '',
+                unmerged = '',
+                untracked = '',
+                renamed = '',
+                deleted = '',
+                ignored = '∅',
+              },
             },
           },
         },
