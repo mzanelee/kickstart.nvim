@@ -4,14 +4,24 @@ return {
     version = '*',
     lazy = false,
     dependencies = {
+      { 'ThePrimeagen/harpoon' },
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
-      local function set_custom_mappings(bufnr)
-        local api = require 'nvim-tree.api'
+      local api = require 'nvim-tree.api'
+      local harpoon = require 'harpoon.mark'
 
+      harpoon.on('changed', function()
+        api.tree.reload()
+      end)
+
+      local function set_custom_mappings(bufnr)
         local function opts(desc)
           return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+
+        local function get_rel_path(node)
+          return vim.fn.fnamemodify(node.absolute_path, ':.')
         end
 
         local function vsplit_preview()
@@ -26,15 +36,35 @@ return {
           api.tree.focus()
         end
 
+        local function harpoon_toggle()
+          local node = api.tree.get_node_under_cursor()
+          if node.nodes == nil then
+            harpoon.toggle_file(get_rel_path(node))
+          end
+        end
+
+        local function remove_mark_with_action(action)
+          return function()
+            local rel_path = get_rel_path(api.tree.get_node_under_cursor())
+            local mark = harpoon.get_marked_file(rel_path)
+            if mark ~= nil then
+              harpoon.rm_file(rel_path)
+            end
+            api.fs[action]()
+          end
+        end
+
         vim.keymap.set('n', 'l', api.node.open.edit, opts 'Edit Or Open')
         vim.keymap.set('n', 'L', vsplit_preview, opts 'Vsplit Preview')
         vim.keymap.set('n', 'h', api.node.navigate.parent_close, opts 'Close')
         vim.keymap.set('n', 'H', api.tree.collapse_all, opts 'Collapse All')
         vim.keymap.set('n', 'N', api.fs.create, opts 'Create New')
-        vim.keymap.set('n', 'd', api.fs.cut, opts 'Cut')
-        vim.keymap.set('n', 'D', api.fs.remove, opts 'Delete')
+        vim.keymap.set('n', 'd', remove_mark_with_action 'cut', opts 'Cut')
+        vim.keymap.set('n', 'D', remove_mark_with_action 'remove', opts 'Delete')
+        vim.keymap.set('n', 'r', remove_mark_with_action 'rename', opts 'Rename')
         vim.keymap.set('n', 'y', api.fs.copy.node, opts 'Copy')
         vim.keymap.set('n', 'p', api.fs.paste, opts 'Paste')
+        vim.keymap.set('n', 'm', harpoon_toggle, opts 'Harpoon Toggle')
       end
 
       require('nvim-tree').setup {
@@ -55,12 +85,21 @@ return {
           root_folder_label = false,
           highlight_git = true,
           indent_markers = { enable = true },
+          decorators = {
+            'Git',
+            'Open',
+            'Hidden',
+            'Modified',
+            'Diagnostics',
+            'Copied',
+            'Cut',
+            require 'custom.decorators.HarpoonMarkDecorator',
+          },
           icons = {
             git_placement = 'after',
             glyphs = {
               default = '󰈚',
               symlink = '󱓻',
-              bookmark = '',
               modified = '',
               hidden = '󱙝',
               folder = {
