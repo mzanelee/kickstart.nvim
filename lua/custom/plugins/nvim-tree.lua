@@ -23,6 +23,21 @@ return {
         end
       end
 
+      local function smart_ctrl_h()
+        local pos = vim.api.nvim_win_get_position(0)
+        local col = pos[2]
+
+        if col == 0 then
+          if vim.bo.filetype == 'NvimTree' then
+            return
+          end
+
+          api.tree.open { find_file = true }
+        else
+          vim.cmd 'wincmd h'
+        end
+      end
+
       vim.keymap.set('n', '<leader>ba', harpoon.add_file, { desc = '[B]ookmark [A]dd File' })
       vim.keymap.set('n', '<leader>br', harpoon.rm_file, { desc = '[B]ookmark [R]emove File' })
       vim.keymap.set('n', '<leader>bn', harpoon_ui.nav_next, { desc = '[B]ookmark [N]ext' })
@@ -33,6 +48,8 @@ return {
       vim.keymap.set('n', '<leader>b4', nav_file(4), { desc = '[B]ookmark Go To File [4]' })
       vim.keymap.set('n', '<leader>b5', nav_file(5), { desc = '[B]ookmark Go To File [5]' })
       vim.keymap.set('n', '<leader>bc', harpoon.clear_all, { desc = '[B]ookmarks [C]lear All' })
+
+      vim.keymap.set('n', '<C-h>', smart_ctrl_h, { desc = 'smart C-h: opens nvim-tree or move left', silent = true })
 
       local function set_custom_mappings(bufnr)
         local function opts(desc)
@@ -45,7 +62,6 @@ return {
 
         local function vsplit_preview()
           local node = api.tree.get_node_under_cursor()
-
           if node.nodes ~= nil then
             api.node.open.edit()
           else
@@ -53,6 +69,14 @@ return {
           end
 
           api.tree.focus()
+        end
+
+        local function edit_and_close_tree()
+          local node = api.tree.get_node_under_cursor()
+          api.node.open.edit()
+          if node.nodes == nil then
+            api.tree.close()
+          end
         end
 
         local function harpoon_toggle()
@@ -75,6 +99,7 @@ return {
 
         vim.keymap.set('n', 'l', api.node.open.edit, opts 'Edit Or Open')
         vim.keymap.set('n', 'L', vsplit_preview, opts 'Vsplit Preview')
+        vim.keymap.set('n', '<C-l>', edit_and_close_tree, opts 'Edit And Close')
         vim.keymap.set('n', 'h', api.node.navigate.parent_close, opts 'Close')
         vim.keymap.set('n', 'H', api.tree.collapse_all, opts 'Collapse All')
         vim.keymap.set('n', 'N', api.fs.create, opts 'Create New')
