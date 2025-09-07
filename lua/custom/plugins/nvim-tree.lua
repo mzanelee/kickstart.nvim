@@ -4,7 +4,7 @@ return {
     version = '*',
     lazy = false,
     dependencies = {
-      { 'ThePrimeagen/harpoon' },
+      { 'mzanelee/harpoon' },
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
@@ -81,8 +81,12 @@ return {
 
         local function harpoon_toggle()
           local node = api.tree.get_node_under_cursor()
-          if node.nodes == nil then
-            harpoon.toggle_file(get_rel_path(node))
+          local rel_path = get_rel_path(node)
+          local mark = harpoon.get_marked_file(rel_path)
+          if mark == nil then
+            harpoon.add_file(rel_path, {})
+          else
+            harpoon.rm_file(rel_path)
           end
         end
 
