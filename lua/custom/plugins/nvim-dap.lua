@@ -2,7 +2,10 @@ return {
   {
     'mfussenegger/nvim-dap',
     dependencies = {
-      'mrcarriga/nvim-dap-ui',
+      {
+        'mrcarriga/nvim-dap-ui',
+        url = 'git@my.github.com:rcarriga/nvim-dap-ui.git',
+      },
       'nvim-neotest/nvim-nio',
       'mason-org/mason.nvim',
       'jay-babu/mason-nvim-dap.nvim',
