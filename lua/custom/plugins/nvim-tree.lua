@@ -10,10 +10,29 @@ return {
     config = function()
       local api = require 'nvim-tree.api'
       local harpoon = require 'harpoon.mark'
+      local harpoon_ui = require 'harpoon.ui'
 
+      -- harpoon setup
       harpoon.on('changed', function()
         api.tree.reload()
       end)
+
+      function nav_file(file_idx)
+        return function()
+          harpoon_ui.nav_file(file_idx)
+        end
+      end
+
+      vim.keymap.set('n', '<leader>ba', harpoon.add_file, { desc = '[B]ookmark [A]dd File' })
+      vim.keymap.set('n', '<leader>br', harpoon.rm_file, { desc = '[B]ookmark [R]emove File' })
+      vim.keymap.set('n', '<leader>bn', harpoon_ui.nav_next, { desc = '[B]ookmark [N]ext' })
+      vim.keymap.set('n', '<leader>bp', harpoon_ui.nav_prev, { desc = '[B]ookmark [P]revious' })
+      vim.keymap.set('n', '<leader>b1', nav_file(1), { desc = '[B]ookmark Go To File [1]' })
+      vim.keymap.set('n', '<leader>b2', nav_file(2), { desc = '[B]ookmark Go To File [2]' })
+      vim.keymap.set('n', '<leader>b3', nav_file(3), { desc = '[B]ookmark Go To File [3]' })
+      vim.keymap.set('n', '<leader>b4', nav_file(4), { desc = '[B]ookmark Go To File [4]' })
+      vim.keymap.set('n', '<leader>b5', nav_file(5), { desc = '[B]ookmark Go To File [5]' })
+      vim.keymap.set('n', '<leader>bc', harpoon.clear_all, { desc = '[B]ookmarks [C]lear All' })
 
       local function set_custom_mappings(bufnr)
         local function opts(desc)
@@ -64,7 +83,7 @@ return {
         vim.keymap.set('n', 'r', remove_mark_with_action 'rename', opts 'Rename')
         vim.keymap.set('n', 'y', api.fs.copy.node, opts 'Copy')
         vim.keymap.set('n', 'p', api.fs.paste, opts 'Paste')
-        vim.keymap.set('n', 'm', harpoon_toggle, opts 'Harpoon Toggle')
+        vim.keymap.set('n', 'b', harpoon_toggle, opts '[B]ookmark Toggle')
       end
 
       require('nvim-tree').setup {
