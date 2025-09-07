@@ -4,6 +4,10 @@
 ---@field private icon_three nvim_tree.api.HighlightedString
 ---@field private icon_four nvim_tree.api.HighlightedString
 ---@field private icon_five nvim_tree.api.HighlightedString
+---@field private icon_six nvim_tree.api.HighlightedString
+---@field private icon_seven nvim_tree.api.HighlightedString
+---@field private icon_eight nvim_tree.api.HighlightedString
+---@field private icon_nine nvim_tree.api.HighlightedString
 local HarpoonMarkDecorator = require('nvim-tree.api').decorator.UserDecorator:extend()
 
 function HarpoonMarkDecorator:new()
@@ -15,12 +19,20 @@ function HarpoonMarkDecorator:new()
   self.icon_three = { str = '3', hl = { 'Mark3' } }
   self.icon_four = { str = '4', hl = { 'Mark4' } }
   self.icon_five = { str = '5', hl = { 'Mark5' } }
+  self.icon_six = { str = '6', hl = { 'Mark6' } }
+  self.icon_seven = { str = '7', hl = { 'Mark7' } }
+  self.icon_eight = { str = '8', hl = { 'Mark8' } }
+  self.icon_nine = { str = '9', hl = { 'Mark9' } }
 
   self:define_sign(self.icon_one)
   self:define_sign(self.icon_two)
   self:define_sign(self.icon_three)
   self:define_sign(self.icon_four)
   self:define_sign(self.icon_five)
+  self:define_sign(self.icon_six)
+  self:define_sign(self.icon_seven)
+  self:define_sign(self.icon_eight)
+  self:define_sign(self.icon_nine)
 end
 
 ---@param node nvim_tree.api.Node
@@ -38,6 +50,14 @@ function HarpoonMarkDecorator:icons(node)
     return { self.icon_four }
   elseif mark_idx == 5 then
     return { self.icon_five }
+  elseif mark_idx == 6 then
+    return { self.icon_six }
+  elseif mark_idx == 7 then
+    return { self.icon_seven }
+  elseif mark_idx == 8 then
+    return { self.icon_eight }
+  elseif mark_idx == 9 then
+    return { self.icon_nine }
   else
     return nil
   end

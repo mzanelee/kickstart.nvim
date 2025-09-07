@@ -47,6 +47,10 @@ return {
       vim.keymap.set('n', '<leader>b3', nav_file(3), { desc = '[B]ookmark Go To File [3]' })
       vim.keymap.set('n', '<leader>b4', nav_file(4), { desc = '[B]ookmark Go To File [4]' })
       vim.keymap.set('n', '<leader>b5', nav_file(5), { desc = '[B]ookmark Go To File [5]' })
+      vim.keymap.set('n', '<leader>b6', nav_file(6), { desc = '[B]ookmark Go To File [6]' })
+      vim.keymap.set('n', '<leader>b7', nav_file(7), { desc = '[B]ookmark Go To File [7]' })
+      vim.keymap.set('n', '<leader>b8', nav_file(8), { desc = '[B]ookmark Go To File [8]' })
+      vim.keymap.set('n', '<leader>b9', nav_file(9), { desc = '[B]ookmark Go To File [9]' })
       vim.keymap.set('n', '<leader>bc', harpoon.clear_all, { desc = '[B]ookmarks [C]lear All' })
 
       vim.keymap.set('n', '<C-h>', smart_ctrl_h, { desc = 'smart C-h: opens nvim-tree or move left', silent = true })
