@@ -52,6 +52,7 @@ return {
       vim.keymap.set('n', '<leader>b8', nav_file(8), { desc = '[B]ookmark Go To File [8]' })
       vim.keymap.set('n', '<leader>b9', nav_file(9), { desc = '[B]ookmark Go To File [9]' })
       vim.keymap.set('n', '<leader>bc', harpoon.clear_all, { desc = '[B]ookmarks [C]lear All' })
+      vim.keymap.set('n', '<leader>bm', harpoon_ui.toggle_quick_menu, { desc = '[B]ookmark [M]enu' })
 
       vim.keymap.set('n', '<C-h>', smart_ctrl_h, { desc = 'smart C-h: opens nvim-tree or move left', silent = true })
 
@@ -88,7 +89,9 @@ return {
           local rel_path = get_rel_path(node)
           local mark = harpoon.get_marked_file(rel_path)
           if mark == nil then
-            harpoon.add_file(rel_path, {})
+            if node.nodes == nil then
+              harpoon.add_file(rel_path, {})
+            end
           else
             harpoon.rm_file(rel_path)
           end
@@ -107,7 +110,7 @@ return {
 
         vim.keymap.set('n', 'l', api.node.open.edit, opts 'Edit Or Open')
         vim.keymap.set('n', 'L', vsplit_preview, opts 'Vsplit Preview')
-        vim.keymap.set('n', '<C-l>', edit_and_close_tree, opts 'Edit And Close')
+        vim.keymap.set('n', '<CR>', edit_and_close_tree, opts 'Edit And Close')
         vim.keymap.set('n', 'h', api.node.navigate.parent_close, opts 'Close')
         vim.keymap.set('n', 'H', api.tree.collapse_all, opts 'Collapse All')
         vim.keymap.set('n', 'N', api.fs.create, opts 'Create New')
