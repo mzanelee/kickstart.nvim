@@ -1,3 +1,4 @@
+local M = {}
 local state = {
   floating = {
     buf = -1,
@@ -36,7 +37,7 @@ function create_floating_window(opts)
   return { buf = buf, win = win }
 end
 
-local toggle_terminal = function()
+M.toggle_terminal = function()
   if not vim.api.nvim_win_is_valid(state.floating.win) then
     state.floating = create_floating_window { buf = state.floating.buf }
     if vim.bo[state.floating.buf].buftype ~= 'terminal' then
@@ -48,5 +49,4 @@ local toggle_terminal = function()
   vim.api.nvim_command 'startinsert'
 end
 
-vim.api.nvim_create_user_command('Floaterminal', toggle_terminal, {})
-vim.keymap.set({ 'n', 't' }, '<leader>tt', toggle_terminal)
+return M

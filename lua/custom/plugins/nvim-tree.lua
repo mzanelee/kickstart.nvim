@@ -52,9 +52,10 @@ return {
       vim.keymap.set('n', '<leader>b8', nav_file(8), { desc = '[B]ookmark Go To File [8]' })
       vim.keymap.set('n', '<leader>b9', nav_file(9), { desc = '[B]ookmark Go To File [9]' })
       vim.keymap.set('n', '<leader>bc', harpoon.clear_all, { desc = '[B]ookmarks [C]lear All' })
-      vim.keymap.set('n', '<leader>bm', harpoon_ui.toggle_quick_menu, { desc = '[B]ookmark [M]enu' })
+      vim.keymap.set('n', '<leader>tB', harpoon_ui.toggle_quick_menu, { desc = '[T]oggle [B]ookmark Menu' })
 
       vim.keymap.set('n', '<C-h>', smart_ctrl_h, { desc = 'smart C-h: opens nvim-tree or move left', silent = true })
+      vim.keymap.set('n', '<leader>tf', api.tree.toggle, { desc = '[T]oggle [F]ile Explorer' })
 
       local function set_custom_mappings(bufnr)
         local function opts(desc)
@@ -148,7 +149,7 @@ return {
             'Diagnostics',
             'Copied',
             'Cut',
-            require 'custom.decorators.HarpoonMarkDecorator',
+            require 'custom.HarpoonMarkDecorator',
           },
           icons = {
             git_placement = 'after',

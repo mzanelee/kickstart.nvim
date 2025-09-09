@@ -244,6 +244,10 @@ vim.api.nvim_create_autocmd('TermOpen', {
   end,
 })
 
+local toggle_terminal = require('custom.Floaterminal').toggle_terminal
+vim.api.nvim_create_user_command('Floaterminal', toggle_terminal, {})
+vim.keymap.set({ 'n', 't' }, '<leader>tt', toggle_terminal, { desc = '[T]oggle [T]erminal' })
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
